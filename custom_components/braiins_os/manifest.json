@@ -1,7 +1,7 @@
 {
   "domain": "braiins_os",
   "name": "Braiins OS",
-  "codeowners": [],
+  "codeowners": ["@drazi979"],
   "config_flow": true,
   "documentation": "https://developer.braiins-os.com/latest/openapi.html",
   "iot_class": "local_polling",
