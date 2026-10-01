@@ -11,7 +11,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import BraiinsApiError, BraiinsAuthError, BraiinsClient
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import CONF_POWER_MAX, CONF_POWER_MIN, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 
 class BraiinsConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -82,14 +82,21 @@ class BraiinsConfigFlow(ConfigFlow, domain=DOMAIN):
 
 class BraiinsOptionsFlow(OptionsFlow):
     async def async_step_init(self, user_input=None) -> ConfigFlowResult:
+        errors = {}
+        opts = self.config_entry.options
         if user_input is not None:
-            return self.async_create_entry(data=user_input)
-        current = self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema({
-                vol.Required(CONF_SCAN_INTERVAL, default=current): vol.All(
-                    int, vol.Range(min=10, max=600)
-                ),
-            }),
-        )
+            lo, hi = user_input.get(CONF_POWER_MIN), user_input.get(CONF_POWER_MAX)
+            if lo is not None and hi is not None and lo >= hi:
+                errors["base"] = "range_invalid"
+            else:
+                return self.async_create_entry(data=user_input)
+            opts = user_input
+        power = vol.All(vol.Coerce(int), vol.Range(min=100, max=20000))
+        schema = {
+            vol.Required(
+                CONF_SCAN_INTERVAL, default=opts.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+            ): vol.All(int, vol.Range(min=10, max=600)),
+            vol.Optional(CONF_POWER_MIN, description={"suggested_value": opts.get(CONF_POWER_MIN)}): power,
+            vol.Optional(CONF_POWER_MAX, description={"suggested_value": opts.get(CONF_POWER_MAX)}): power,
+        }
+        return self.async_show_form(step_id="init", data_schema=vol.Schema(schema), errors=errors)

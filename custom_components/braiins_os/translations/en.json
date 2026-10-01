@@ -4,12 +4,19 @@
       "user": {
         "title": "Braiins OS miner",
         "description": "Uses the Braiins OS REST API. Leave the password empty if none is set on the miner.",
-        "data": {"host": "Host", "port": "Port", "username": "Username", "password": "Password"}
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password"
+        }
       },
       "reauth_confirm": {
         "title": "Re-authenticate Braiins OS",
         "description": "The miner rejected the saved credentials. Enter the current password.",
-        "data": {"password": "Password"}
+        "data": {
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -25,8 +32,16 @@
     "step": {
       "init": {
         "title": "Braiins OS options",
-        "data": {"scan_interval": "Polling interval (seconds)"}
+        "description": "Optional: limit the Power target slider to a range (W). Leave empty to use the miner's own limits. Values are rounded to multiples of 100 W.",
+        "data": {
+          "scan_interval": "Polling interval (seconds)",
+          "power_min": "Slider minimum power (W)",
+          "power_max": "Slider maximum power (W)"
+        }
       }
+    },
+    "error": {
+      "range_invalid": "Minimum must be lower than maximum"
     }
   }
 }
