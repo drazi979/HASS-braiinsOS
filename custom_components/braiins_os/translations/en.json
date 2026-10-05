@@ -1,0 +1,58 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Braiins OS miner",
+        "description": "Uses the Braiins OS REST API. Leave the password empty if none is set on the miner.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Braiins OS",
+        "description": "The miner rejected the saved credentials. Enter the current password.",
+        "data": {
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Braiins OS miner",
+        "description": "Change the miner address or credentials, for example after an IP change.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to the miner API",
+      "invalid_auth": "Invalid username or password"
+    },
+    "abort": {
+      "already_configured": "This miner is already configured",
+      "reauth_successful": "Re-authentication was successful",
+      "reconfigure_successful": "The miner connection was updated"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Braiins OS options",
+        "description": "Optional: limit the Power target slider to a range (W). Leave empty to use the miner's own limits. Values are rounded to multiples of 100 W.",
+        "data": {
+          "scan_interval": "Polling interval (seconds)",
+          "power_min": "Slider minimum power (W)",
+          "power_max": "Slider maximum power (W)"
+        }
+      }
+    },
+    "error": {
+      "range_invalid": "Minimum must be lower than maximum"
+    }
+  }
+}
