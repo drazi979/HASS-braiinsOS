@@ -13,7 +13,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import BraiinsConfigEntry
-from .api import dig
+from .api import dig, target_power
 from .entity import BraiinsEntity
 
 STATUSES = ["unspecified", "not_started", "normal", "paused", "suspended", "restricted"]
@@ -30,8 +30,8 @@ def miner_status(details: dict) -> str | None:
     return None
 
 
-# overall_tuner_state. Names per Braiins Public API docs; 2 = stable is confirmed on a
-# live miner. 5/6 (continuous, preheat) are assumed from the order they were added to the
+# overall_tuner_state. Names per Braiins Public API docs; 2 = stable and 3 = tuning are confirmed
+# on a live miner. 5/6 (continuous, preheat) are assumed from the order they were added to the
 # API (1.9.0, 1.11.0); the raw_value attribute on the sensor lets you verify them.
 TUNER_STATES = {
     0: "unspecified", 1: "disabled", 2: "stable", 3: "tuning", 4: "error",
@@ -93,6 +93,7 @@ def _pool_sum(field: str) -> Callable[[dict], int | None]:
 class BraiinsSensorDescription(SensorEntityDescription):
     value_fn: Callable[[dict], Any]
     raw_fn: Callable[[dict], Any] | None = None
+    attrs_fn: Callable[[dict], dict[str, Any]] | None = None
 
 
 TEMP = dict(
@@ -119,8 +120,9 @@ SENSORS = (
         state_class=SensorStateClass.MEASUREMENT, value_fn=_hashrate),
     BraiinsSensorDescription(key="power", name="Power", value_fn=_power, **POWER),
     BraiinsSensorDescription(
-        key="power_limit", name="Power limit",
+        key="power_limit", name="Active power limit",
         value_fn=lambda d: dig(d["tuner"], "mode_state", "powertargetmodestate", "current_target", "watt"),
+        attrs_fn=lambda d: {"target": target_power(d["tuner"])},
         **POWER),
     BraiinsSensorDescription(
         key="efficiency", name="Efficiency", native_unit_of_measurement="J/TH",
@@ -187,8 +189,13 @@ class BraiinsSensor(BraiinsEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
-        fn = self.entity_description.raw_fn
-        return {"raw_value": fn(self.coordinator.data)} if fn else None
+        desc, data = self.entity_description, self.coordinator.data
+        attrs: dict[str, Any] = {}
+        if desc.raw_fn:
+            attrs["raw_value"] = desc.raw_fn(data)
+        if desc.attrs_fn:
+            attrs.update(desc.attrs_fn(data))
+        return attrs or None
 
 
 class BraiinsBoardSensor(BraiinsEntity, SensorEntity):

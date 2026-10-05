@@ -9,9 +9,13 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.selector import TextSelector, TextSelectorConfig, TextSelectorType
 
 from .api import BraiinsApiError, BraiinsAuthError, BraiinsClient
 from .const import CONF_POWER_MAX, CONF_POWER_MIN, DEFAULT_SCAN_INTERVAL, DOMAIN
+
+
+PASSWORD = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
 
 
 class BraiinsConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -52,7 +56,34 @@ class BraiinsConfigFlow(ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_HOST): str,
                 vol.Required(CONF_PORT, default=80): int,
                 vol.Required(CONF_USERNAME, default="root"): str,
-                vol.Optional(CONF_PASSWORD, default=""): str,
+                vol.Optional(CONF_PASSWORD, default=""): PASSWORD,
+            }),
+            errors=errors,
+        )
+
+    async def async_step_reconfigure(self, user_input=None) -> ConfigFlowResult:
+        """Change host/port/credentials (e.g. after the miner got a new IP)."""
+        entry = self._get_reconfigure_entry()
+        errors = {}
+        if user_input is not None:
+            user_input.setdefault(CONF_PASSWORD, "")
+            error = await self._check(
+                user_input[CONF_HOST], user_input[CONF_PORT],
+                user_input[CONF_USERNAME], user_input[CONF_PASSWORD],
+            )
+            if error is None:
+                return self.async_update_reload_and_abort(
+                    entry, data_updates=user_input, title=f"Braiins OS {user_input[CONF_HOST]}"
+                )
+            errors["base"] = error
+        cur = entry.data
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=vol.Schema({
+                vol.Required(CONF_HOST, default=cur[CONF_HOST]): str,
+                vol.Required(CONF_PORT, default=cur[CONF_PORT]): int,
+                vol.Required(CONF_USERNAME, default=cur[CONF_USERNAME]): str,
+                vol.Optional(CONF_PASSWORD, default=cur[CONF_PASSWORD]): PASSWORD,
             }),
             errors=errors,
         )
@@ -75,7 +106,7 @@ class BraiinsConfigFlow(ConfigFlow, domain=DOMAIN):
             errors["base"] = error
         return self.async_show_form(
             step_id="reauth_confirm",
-            data_schema=vol.Schema({vol.Optional(CONF_PASSWORD, default=""): str}),
+            data_schema=vol.Schema({vol.Optional(CONF_PASSWORD, default=""): PASSWORD}),
             errors=errors,
         )
 

@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import BraiinsConfigEntry
-from .api import BraiinsApiError, dig
+from .api import BraiinsApiError, dig, target_power
 from .const import CONF_POWER_MAX, CONF_POWER_MIN
 from .entity import BraiinsEntity
 
@@ -66,8 +66,7 @@ class BraiinsPowerTarget(BraiinsEntity, NumberEntity):
 
     @property
     def native_value(self) -> float | None:
-        return dig(self.coordinator.data["tuner"], "mode_state", "powertargetmodestate",
-                   "current_target", "watt")
+        return target_power(self.coordinator.data["tuner"])
 
     async def async_set_native_value(self, value: float) -> None:
         await self.async_api("PUT", "performance/power-target", {"watt": int(value)})

@@ -25,6 +25,15 @@ def dig(data: Any, *keys: str) -> Any:
     return data
 
 
+def target_power(tuner: Any) -> Any:
+    """Configured autotuning power target (W), i.e. what was set in the UI / by the slider.
+
+    With Dynamic Performance Scaling the live `current_target` climbs toward this value
+    in steps, so it is NOT the same thing.
+    """
+    return dig(tuner, "mode_state", "powertargetmodestate", "profile", "target", "watt")
+
+
 class BraiinsClient:
     """REST client with automatic token handling.
 

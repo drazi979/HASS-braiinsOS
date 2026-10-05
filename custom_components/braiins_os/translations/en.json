@@ -17,6 +17,16 @@
         "data": {
           "password": "Password"
         }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Braiins OS miner",
+        "description": "Change the miner address or credentials, for example after an IP change.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -25,7 +35,8 @@
     },
     "abort": {
       "already_configured": "This miner is already configured",
-      "reauth_successful": "Re-authentication was successful"
+      "reauth_successful": "Re-authentication was successful",
+      "reconfigure_successful": "The miner connection was updated"
     }
   },
   "options": {
