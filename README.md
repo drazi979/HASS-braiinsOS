@@ -7,7 +7,7 @@
 
 A custom integration for Home Assistant that lets you monitor and control a cryptocurrency miner running **Braiins OS**. It talks directly to the miner's local **REST API**, so no cloud service is needed.
 
-It was built and tested on a water-cooled **Antminer S19e XP** (no fans), which is why it reports water inlet and outlet temperatures and has no fan sensors.
+It was built and tested on a water-cooled **Antminer S19e XP Hydro** (no fans), which is why it reports water inlet and outlet temperatures and has no fan sensors.
 
 > **Disclaimer:** This is an unofficial community project and is not affiliated with Braiins. Changing power targets or other settings on mining hardware is done at your own risk.
 
