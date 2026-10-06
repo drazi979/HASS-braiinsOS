@@ -110,11 +110,34 @@ To track energy use in the Home Assistant **Energy dashboard**:
 
 ## Version history
 
-| Version | What it included / what changed |
-| --- | --- |
-| **0.3.0** | First working version. Connects to the Braiins OS REST API with automatic token refresh and a re-authentication prompt. Sensors for hashrate, power limit, power consumption, efficiency, water inlet/outlet temperature, chip and per-hashboard temperatures, pool shares and miner status. Pause/resume switch, reboot button, power target number (step 100 W, minimum rounded up and maximum rounded down to multiples of 100) and a configurable polling interval. Known issue: chip temperature sensors showed no values. |
-| **0.3.1** | First version published on GitHub with HACS support. |
-| **0.4.0 – 0.4.2** | Power target is now a slider with configurable minimum and maximum. Added brand images (icon) so the integration is recognisable in Home Assistant. Improved behaviour with Dynamic Performance Scaling, where the tuner reaches the target step by step. Repository cleanup for HACS validation (manifest, topics, hacs.json). |
+### v0.4.2
+- Integration icon and logo (`brand` folder) now use the Braiins mark, redrawn as sharp polygons so it stays crisp at 256 px and 512 px.
+- **Power target slider fix:** the slider now shows the configured autotuning power target. Before, it showed the tuner's live value, which climbs in steps when Dynamic Performance Scaling (DPS) is enabled, so the slider jumped back after every change.
+- The former "Power limit" sensor is now **Active power limit** (the tuner's live value). It has a `target` attribute with the configured target.
+- **Reconfigure:** host, port and credentials can be changed from the integration menu (for example after an IP change).
+- The password field is masked in the setup, re-authentication and reconfigure forms.
+
+### v0.4.0
+- **Power target is now a slider** (steps of 100 W).
+- **Configurable slider range:** under *Configure* you can set a minimum and maximum power in watts. The values are kept inside the miner's own limits and rounded to multiples of 100 W.
+- Placeholder integration icon and logo.
+
+### v0.3.3 (first release)
+- Connects to the **Braiins OS REST API** (`/api/v1`), with automatic token refresh and a re-authentication prompt if the password is rejected.
+- **Sensors:**
+  - hashrate, power, power limit, efficiency (J/TH)
+  - water inlet and outlet temperature, chip temperature
+  - per-hashboard chip, water inlet and water outlet temperatures
+  - accepted and rejected shares
+  - miner status and tuner status
+- **Controls:**
+  - mining switch (pause and resume)
+  - reboot button
+  - power target (steps of 100 W, range taken from the miner's limits)
+- Tuner status knows `unspecified`, `disabled`, `stable`, `tuning`, `error`, `continuous` and `preheat`. Stable and tuning are verified on a real miner; the numbers for continuous (5) and preheat (6) are assumed.
+- The Status and Tuner status sensors have a `raw_value` attribute with the value exactly as the miner sends it.
+- The mining switch counts only the `normal` status as on.
+- Polling interval is configurable (10–600 s). If only the secondary endpoints fail (for example while the miner is paused), the entities show unknown instead of unavailable, so the switch stays usable.
 
 See the [releases page](https://github.com/drazi979/HASS-braiinsOS/releases) for the full notes of each version.
 
