@@ -143,9 +143,9 @@ See the [releases page](https://github.com/drazi979/HASS-braiinsOS/releases) for
 
 ## Known issues
 
-- **Tuner status wording**: the raw tuner state `3` is shown as "tuning" in Home Assistant, while the Braiins OS web interface shows "Running" for the same state. The "preheat" state has not been verified yet.
+- **Tuner status wording**: the raw tuner state `3` is shown as "tuning" in Home Assistant, while the Braiins OS web interface shows "Running" for the same state.
 - **Power limit lag**: with Dynamic Performance Scaling enabled, the power limit sensor reaches a new target only after several tuner steps (see [How the power target works](#how-the-power-target-works)).
-- Tested only on an Antminer S19e XP. Other models should work through the same API but have not been verified.
+- Tested only on an Antminer S19e XP Hydro. Other models should work through the same API but have not been verified.
 
 ## AI Assistance
 
